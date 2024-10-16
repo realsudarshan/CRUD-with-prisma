@@ -4,18 +4,18 @@ import {prisma} from "../config/database.js"
 import JSONbig from 'json-bigint'
 export const router=Router();
 
-router.get('/getdata',async(req:Request,res:Response):Promise<any>=>{
+router.get('/',async(req:Request,res:Response):Promise<any>=>{
     const users=await prisma.user.findMany();
 
     return res.send(JSONbig.stringify(users))
 
 })
-router.get('/getdata/id/:id',async(req:Request,res:Response):Promise<any>=>{
-    const {id}=req.params;
+router.get('/id/:userid',async(req:Request,res:Response):Promise<any>=>{
+    const {userid}=req.params;
     try {
        const user=await prisma.user.findUnique({
         where:{
-            id
+            id:userid
         }
        })
        res.send(JSONbig.stringify(user))
@@ -25,7 +25,7 @@ router.get('/getdata/id/:id',async(req:Request,res:Response):Promise<any>=>{
     }
 
 })
-router.get('/getdata/name/:name',async(req:Request,res:Response):Promise<any>=>{
+router.get('/name/:name',async(req:Request,res:Response):Promise<any>=>{
    try {
      const {name}=req.params;
      const users=await prisma.user.findMany({
@@ -39,7 +39,7 @@ router.get('/getdata/name/:name',async(req:Request,res:Response):Promise<any>=>{
    }
 
 })
-router.get('/getdata/email/:email',async(req:Request,res:Response):Promise<any>=>{
+router.get('/email/:email',async(req:Request,res:Response):Promise<any>=>{
     const {email}=req.params;
     try {
        const user=await prisma.user.findUnique({
@@ -54,7 +54,7 @@ router.get('/getdata/email/:email',async(req:Request,res:Response):Promise<any>=
     }
 
 })
-router.post("/postdata",async(req:Request,res:Response):Promise<any>=>{
+router.post("/",async(req:Request,res:Response):Promise<any>=>{
 try {
         const {name,email,password,contact,description,familymembers,DOB}=req.body;
         if(!name || !email || !password ||!DOB){
@@ -76,13 +76,13 @@ try {
 }
 
 })
-router.put("/updatedata/:id",async(req:Request,res:Response):Promise<any>=>{
-    const {id}=req.params
+router.put("/id/:userid",async(req:Request,res:Response):Promise<any>=>{
+    const {userid}=req.params
     const { name, email, password, contact, description, familymembers, DOB } = req.body;
      
     try {
         const updatedUser=await prisma.user.update({
-            where:{id},
+            where:{id:userid},
             data:{
                 name,
                 email,
@@ -103,11 +103,11 @@ router.put("/updatedata/:id",async(req:Request,res:Response):Promise<any>=>{
 
 });
 
-router.delete("/deletedata/:id",async(req:Request,res:Response):Promise<any>=>{
+router.delete("id/:userid",async(req:Request,res:Response):Promise<any>=>{
    try {
-     const {id}=req.params
+     const {userid}=req.params
      const deletedUser=await prisma.user.delete({
-         where:{id}
+         where:{id:userid}
      })
      res.send(JSONbig.stringify(deletedUser))
    } catch (error) {
@@ -115,4 +115,5 @@ router.delete("/deletedata/:id",async(req:Request,res:Response):Promise<any>=>{
     
    }
 })
+
 

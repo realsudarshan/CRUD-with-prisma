@@ -23,6 +23,53 @@ model User{
  creation_time DateTime @default(now())
  familymembers String[]
  DOB DateTime
+ posts Post[]
+ like Like[]
+ comment Comment[]
+//  following Follow[] @relation("Following")
+// follower Follow[] @relation("Follower")
 }
+
+model Post{
+  id String @id @default(uuid())
+   content String
+   created_at DateTime @default(now())
+   updated_at DateTime @updatedAt
+   authorid String 
+   author User @relation(fields: [authorid],references: [id])
+   comments Comment[]
+   like Like[]
+}
+
+model Like{
+  id String @id @default(uuid())
+  userId String
+  postId String
+  user User @relation(fields: [userId],references: [id])
+  post Post @relation(fields: [postId],references: [id])
+    @@unique([userId, postId])
+}
+
+model Comment{
+  id String @id @default(uuid())
+  content String
+  userId String
+  postId String
+  user User @relation(fields: [userId],references: [id])
+  post Post @relation(fields: [postId],references: [id])
+}
+
+// model Follow{
+//   id String @id @default(uuid())
+//   followerid String
+//   followingid String
+//   follower User @relation("Follower",fields: [followerid],references: [id])
+//   following User @relation("Following",fields: [followingid],references: [id])
+
+  
+
+// }
+
+
 
 
