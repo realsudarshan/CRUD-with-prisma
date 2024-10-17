@@ -121,28 +121,59 @@ router.get('/like/:postid',async(req:Request,res:Response):Promise<any>=>{
     const{postid}=req.params;
     console.log(postid)
     try {
-        const post=await prisma.post.findUnique({
+        const userids=await prisma.post.findUnique({
             where:{
                 id:postid
             },
-            include:{
-                like:true
+            select:{
+                like:{
+                    select:{userId:true}
+                }
             }
 
         })
 
-        if(!post){
+        if(!userids){
             res.json({error:"post not found"})
         }
-        if(post && post.like){
-            const usersids=post.like.map((like)=>like.userId)
-            return res.json({Userids:usersids})
+        //userid is in format of {like{userid}} so for returning only array of userid
+            return res.json({Userids:userids?.like.map((like)=>like.userId)})
         }
-    } catch (err) {
+     catch (err) {
         res.json(err)
         
     }
 })
 
-
+router.get('/comment/:postid',async(req,res):Promise<any>=>{
+    const{postid}=req.params;
+    if(!postid){return res.json({error:"Invalid postid"})}
+    try {
+        const users=await prisma.post.findUnique({
+            where:{
+                id:postid
+            },
+            select:{
+                comments:{
+                    select:{
+                        id:true,
+                        content:true,
+                        user:{
+                            select:{
+                                id:true,
+                                name:true
+                            }
+                        }
+                    }
+                }
+            }
+    
+        })
+        return res.json(users)
+    } catch (error) {
+        return res.json(error);
+        
+    }
+    })
+    
  
