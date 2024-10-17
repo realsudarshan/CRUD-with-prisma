@@ -176,3 +176,45 @@ try {
     
 }
 })
+router.get('/follower/:id',async(req:Request,res:Response)=>{
+    const {id}=req.body;
+    try {
+     const followers=await prisma.user.findMany({
+        where:{
+            following:{
+               some:{followingid:id} 
+            }
+        },
+        select:{
+            id:true,
+            name:true,
+            email:true
+        }
+     })
+     res.send(200).json(followers)   
+    } catch (error) {
+        res.send(500).json(error)
+        
+    }
+})
+router.get('/following/:id',async(req:Request,res:Response)=>{
+    const {id}=req.body;
+    try {
+     const followings=await prisma.user.findMany({
+        where:{
+            follower:{
+               some:{followerid:id} 
+            }
+        },
+        select:{
+            id:true,
+            name:true,
+            email:true
+        }
+     })
+     res.send(200).json(followings)   
+    } catch (error) {
+        res.send(500).json(error)
+        
+    }
+})
