@@ -117,6 +117,32 @@ router.post('/search',async(req:Request,res:Response):Promise<any>=>{
         return res.json(error)
     }
 })
- 
+router.get('/like/:postid',async(req:Request,res:Response):Promise<any>=>{
+    const{postid}=req.params;
+    console.log(postid)
+    try {
+        const post=await prisma.post.findUnique({
+            where:{
+                id:postid
+            },
+            include:{
+                like:true
+            }
+
+        })
+
+        if(!post){
+            res.json({error:"post not found"})
+        }
+        if(post && post.like){
+            const usersids=post.like.map((like)=>like.userId)
+            return res.json({Userids:usersids})
+        }
+    } catch (err) {
+        res.json(err)
+        
+    }
+})
+
 
  

@@ -3,15 +3,18 @@ import JSONbig from 'json-bigint'
 import {prisma} from "../config/database.js"
 import { Router } from 'express'
 export const router=Router();
-router.get('/post/:postid',async(req:Request,res:Response):Promise<any>=>{
+router.post('/post/:postid',async(req:Request,res:Response):Promise<any>=>{
     const {postid}=req.params;
     const {userid}=req.body;
     try {
         const post=await prisma.post.findUnique({
             where:{id:postid}
         })
-        if(!post){
-            return res.json({error:"post not found"})
+        const user=await prisma.user.findUnique({
+            where:{id:userid}
+        })
+        if(!post || !user){
+            return res.json({error:"post or user  not found"})
         }
         const existinglike=await prisma.like.findUnique({
             where:{
@@ -30,23 +33,27 @@ router.get('/post/:postid',async(req:Request,res:Response):Promise<any>=>{
               postId:postid
             },
           });
-res.json(like);
+return res.json(like);
 
 
     } catch (error) {
         return res.json(error)
     }
 })
-router.delete('post/:postid'),async(req:Request,res:Response):Promise<any>=>{
+router.delete('/post/:postid',async(req:Request,res:Response):Promise<any>=>{
     const{postid}=req.params;
     const {userid}=req.body;
     try{
         const post=await prisma.post.findUnique({
             where:{id:postid}
         })
-        if(!post){
-           return res.status(404).json({error:"Post not found"})
-        }
+        const user=await prisma.user.findUnique({
+            where:{id:userid}
+        })
+        if(!post || !user){
+           return res.status(404).json({error:"Post or user not found"});
+           }
+        
         const existinglike=await prisma.like.findUnique({
             where:{
                 userId_postId:{
@@ -71,4 +78,4 @@ router.delete('post/:postid'),async(req:Request,res:Response):Promise<any>=>{
 
     }
 
-}
+})

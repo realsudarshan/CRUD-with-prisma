@@ -12,6 +12,8 @@ router.get('/',async(req:Request,res:Response):Promise<any>=>{
 })
 router.get('/id/:userid',async(req:Request,res:Response):Promise<any>=>{
     const {userid}=req.params;
+    console.log(userid)
+
     try {
        const user=await prisma.user.findUnique({
         where:{
@@ -54,7 +56,7 @@ router.get('/email/:email',async(req:Request,res:Response):Promise<any>=>{
     }
 
 })
-router.post("/",async(req:Request,res:Response):Promise<any>=>{
+router.post('/',async(req:Request,res:Response):Promise<any>=>{
 try {
         const {name,email,password,contact,description,familymembers,DOB}=req.body;
         if(!name || !email || !password ||!DOB){
@@ -76,7 +78,7 @@ try {
 }
 
 })
-router.put("/id/:userid",async(req:Request,res:Response):Promise<any>=>{
+router.put('/id/:userid',async(req:Request,res:Response):Promise<any>=>{
     const {userid}=req.params
     const { name, email, password, contact, description, familymembers, DOB } = req.body;
      
@@ -103,7 +105,7 @@ router.put("/id/:userid",async(req:Request,res:Response):Promise<any>=>{
 
 });
 
-router.delete("id/:userid",async(req:Request,res:Response):Promise<any>=>{
+router.delete('id/:userid',async(req:Request,res:Response):Promise<any>=>{
    try {
      const {userid}=req.params
      const deletedUser=await prisma.user.delete({
@@ -114,6 +116,34 @@ router.delete("id/:userid",async(req:Request,res:Response):Promise<any>=>{
     res.json(error);
     
    }
+})
+router.get('/like/:userid',async(req:Request,res:Response):Promise<any>=>{
+    const {userid} =req.body;
+    console.log(userid)
+    try {
+        const user=await prisma.user.findUnique({
+            where:{
+                id:userid
+            },
+            include:{
+                like:true
+            }
+        })
+        if(!user){
+            return res.json({error:"User not found"});
+            }
+if(user.like){
+    const postids=user.like.map((like)=>(like.postId))
+    return res.json({postids:postids})
+}
+return res.json({message:"User dont liked any post"})
+
+       
+
+    } catch (err) {
+        res.status(500).json(err)
+        
+    }
 })
 
 
