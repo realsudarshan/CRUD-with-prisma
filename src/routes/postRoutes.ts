@@ -145,5 +145,35 @@ router.get('/like/:postid',async(req:Request,res:Response):Promise<any>=>{
     }
 })
 
-
+router.get('/comment/:postid',async(req,res):Promise<any>=>{
+    const{postid}=req.params;
+    if(!postid){return res.json({error:"Invalid postid"})}
+    try {
+        const users=await prisma.post.findUnique({
+            where:{
+                id:postid
+            },
+            select:{
+                comments:{
+                    select:{
+                        id:true,
+                        content:true,
+                        user:{
+                            select:{
+                                id:true,
+                                name:true
+                            }
+                        }
+                    }
+                }
+            }
+    
+        })
+        return res.json(users)
+    } catch (error) {
+        return res.json(error);
+        
+    }
+    })
+    
  

@@ -146,4 +146,33 @@ return res.json({message:"User dont liked any post"})
     }
 })
 
+router.get('/comment/:userid',async(req,res):Promise<any>=>{
+const{userid}=req.params;
+if(!userid){return res.json({error:"Invalid userid"})}
+try {
+    const post=await prisma.user.findUnique({
+        where:{
+            id:userid
+        },
+        select:{
+            comment:{
+                select:{
+                    id:true,
+                    content:true,
+                    post:{
+                        select:{
+                            id:true,
+                            content:true
+                        }
+                    }
+                }
+            }
+        }
 
+    })
+    return res.json(post)
+} catch (error) {
+    return res.json(error);
+    
+}
+})
